@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="system">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PradaBolt — Pradary</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+  <style>
+    /* ─── THEME TOKENS ─── */
+    :root {
+      --bg:        #f5f2ee;
+      --surface:   #ede9e3;
+      --border:    #d4cfc8;
+      --text:      #1a1714;
+      --muted:     #6b6560;
+      --accent:    #c0392b;
+      --accent2:   #e67e22;
+      --tag-bg:    #e8e3dc;
+      --card-bg:   #ede9e3;
+      --glow:      rgba(192,57,43,0.15);
+    }
+
+    [data-theme="dark"] {
+      --bg:        #0f0e0c;
+      --surface:   #1a1814;
+      --border:    #2e2b26;
+      --text:      #f0ece6;
+      --muted:     #8a8278;
+      --accent:    #e05c4a;
+      --accent2:   #f0923a;
+      --tag-bg:    #222018;
+      --card-bg:   #1a1814;
+      --glow:      rgba(224,92,74,0.2);
+    }
+
+    /* ─── RESET & BASE ─── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Mono', monospace;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      transition: background 0.35s, color 0.35s;
+      overflow-x: hidden;
+    }
+
+    /* ─── NOISE TEXTURE OVERLAY ─── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.4;
+    }
+
+    /* ─── LAYOUT ─── */
+    .container {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 0 24px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ─── HEADER / NAV ─── */
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 28px 0 0;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 20px;
+    }
+
+    .logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.35rem;
+      letter-spacing: -0.03em;
+      text-decoration: none;
+      color: var(--text);
+    }
+
+    .logo span {
+      color: var(--accent);
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .nav-link {
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 6px 10px;
+      border-radius: 4px;
+      transition: color 0.2s, background 0.2s;
+    }
+    .nav-link:hover { color: var(--text); background: var(--tag-bg); }
+
+    /* ─── THEME SWITCHER ─── */
+    .theme-switcher {
+      display: flex;
+      gap: 2px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 3px;
+      margin-left: 8px;
+    }
+
+    .theme-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 5px 9px;
+      border-radius: 5px;
+      font-size: 0.75rem;
+      color: var(--muted);
+      transition: all 0.2s;
+      font-family: 'DM Mono', monospace;
+      letter-spacing: 0.04em;
+    }
+
+    .theme-btn:hover { color: var(--text); }
+    .theme-btn.active {
+      background: var(--bg);
+      color: var(--accent);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+    }
+
+    /* ─── HERO ─── */
+    .hero {
+      padding: 72px 0 56px;
+      position: relative;
+    }
+
+    .hero-eyebrow {
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .hero-eyebrow::after {
+      content: '';
+      flex: 1;
+      max-width: 48px;
+      height: 1px;
+      background: var(--accent);
+      opacity: 0.5;
+    }
+
+    .hero-name {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: clamp(3.2rem, 9vw, 5.8rem);
+      line-height: 0.92;
+      letter-spacing: -0.04em;
+      color: var(--text);
+      margin-bottom: 28px;
+    }
+
+    .hero-name .highlight {
+      color: var(--accent);
+      position: relative;
+      display: inline-block;
+    }
+
+    .hero-name .highlight::after {
+      content: '';
+      position: absolute;
+      bottom: 4px;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--accent2);
+      opacity: 0.4;
+      border-radius: 2px;
+    }
+
+    .hero-bio {
+      font-size: 0.92rem;
+      line-height: 1.8;
+      color: var(--muted);
+      max-width: 480px;
+      margin-bottom: 40px;
+    }
+
+    .hero-bio strong {
+      color: var(--text);
+      font-weight: 400;
+    }
+
+    /* ─── ACCENT LINE ─── */
+    .accent-line {
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(90deg, var(--accent) 0%, var(--accent2) 40%, transparent 100%);
+      margin-bottom: 56px;
+      opacity: 0.6;
+    }
+
+    /* ─── SOCIAL LINKS ─── */
+    .section-label {
+      font-size: 0.65rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 18px;
+    }
+
+    .socials-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 10px;
+      margin-bottom: 56px;
+    }
+
+    .social-card {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 18px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      text-decoration: none;
+      color: var(--text);
+      transition: all 0.22s cubic-bezier(0.4,0,0.2,1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .social-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--glow);
+      opacity: 0;
+      transition: opacity 0.22s;
+    }
+
+    .social-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px var(--glow);
+    }
+
+    .social-card:hover::before { opacity: 1; }
+
+    .social-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: var(--tag-bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 1rem;
+      transition: background 0.2s;
+    }
+
+    .social-card:hover .social-icon {
+      background: var(--accent);
+    }
+
+    .social-icon svg {
+      width: 16px;
+      height: 16px;
+      fill: var(--muted);
+      transition: fill 0.2s;
+    }
+
+    .social-card:hover .social-icon svg {
+      fill: #fff;
+    }
+
+    .social-info { min-width: 0; }
+
+    .social-name {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 0.82rem;
+      letter-spacing: 0.02em;
+      margin-bottom: 2px;
+    }
+
+    .social-handle {
+      font-size: 0.7rem;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .social-arrow {
+      margin-left: auto;
+      font-size: 0.75rem;
+      color: var(--border);
+      transition: color 0.2s, transform 0.2s;
+      flex-shrink: 0;
+    }
+    .social-card:hover .social-arrow {
+      color: var(--accent);
+      transform: translateX(3px);
+    }
+
+    /* ─── STATUS/INFO STRIP ─── */
+    .info-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 56px;
+    }
+
+    .info-tag {
+      font-size: 0.7rem;
+      letter-spacing: 0.06em;
+      padding: 6px 12px;
+      background: var(--tag-bg);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .info-tag .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent2);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    /* ─── FOOTER ─── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 28px 0 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .footer-text {
+      font-size: 0.68rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+    }
+
+    .footer-text a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    /* ─── ANIMATIONS ─── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero-eyebrow { animation: fadeUp 0.5s ease both; }
+    .hero-name    { animation: fadeUp 0.5s 0.1s ease both; }
+    .hero-bio     { animation: fadeUp 0.5s 0.2s ease both; }
+    .info-strip   { animation: fadeUp 0.5s 0.3s ease both; }
+    .socials-grid { animation: fadeUp 0.5s 0.4s ease both; }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 520px) {
+      .nav-link { display: none; }
+      .socials-grid { grid-template-columns: 1fr; }
+      footer { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- NAV -->
+  <nav>
+    <a class="logo" href="#"><span>Prada</span>Bolt</a>
+    <div class="nav-right">
+      <a class="nav-link" href="#about">About</a>
+      <a class="nav-link" href="#links">Links</a>
+      <div class="theme-switcher">
+        <button class="theme-btn" data-mode="light" title="Light mode">☀</button>
+        <button class="theme-btn active" data-mode="system" title="Follow system">⊙</button>
+        <button class="theme-btn" data-mode="dark" title="Dark mode">☽</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero" id="about">
+    <p class="hero-eyebrow">Personal space</p>
+    <h1 class="hero-name">Pra<br><span class="highlight">dary.</span></h1>
+    <p class="hero-bio">
+      Welcome to <strong>PradaBolt</strong> — my corner of the internet.<br>
+      Find me across the platforms below, or just stick around and explore.
+    </p>
+
+    <div class="info-strip">
+      <span class="info-tag"><span class="dot"></span> Available online</span>
+      <span class="info-tag">🌍 Pradary</span>
+      <span class="info-tag">⚡ PradaBolt</span>
+    </div>
+  </section>
+
+  <div class="accent-line"></div>
+
+  <!-- SOCIAL LINKS -->
+  <section id="links">
+    <p class="section-label">Find me on</p>
+    <div class="socials-grid">
+
+      <!-- GitHub -->
+      <a class="social-card" href="https://github.com/pradary" target="_blank" rel="noopener">
+        <div class="social-icon">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
+          </svg>
+        </div>
+        <div class="social-info">
+          <div class="social-name">GitHub</div>
+          <div class="social-handle">@pradary</div>
+        </div>
+        <span class="social-arrow">→</span>
+      </a>
+
+      <!-- Telegram -->
+      <a class="social-card" href="https://t.me/pradary" target="_blank" rel="noopener">
+        <div class="social-icon">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+          </svg>
+        </div>
+        <div class="social-info">
+          <div class="social-name">Telegram</div>
+          <div class="social-handle">@pradary</div>
+        </div>
+        <span class="social-arrow">→</span>
+      </a>
+
+      <!-- X / Twitter -->
+      <a class="social-card" href="https://x.com/pradary" target="_blank" rel="noopener">
+        <div class="social-icon">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.747l7.73-8.835L1.254 2.25H8.08l4.259 5.63 5.905-5.63zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+          </svg>
+        </div>
+        <div class="social-info">
+          <div class="social-name">X (Twitter)</div>
+          <div class="social-handle">@pradary</div>
+        </div>
+        <span class="social-arrow">→</span>
+      </a>
+
+      <!-- YouTube -->
+      <a class="social-card" href="https://youtube.com/@pradary" target="_blank" rel="noopener">
+        <div class="social-icon">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+          </svg>
+        </div>
+        <div class="social-info">
+          <div class="social-name">YouTube</div>
+          <div class="social-handle">@pradary</div>
+        </div>
+        <span class="social-arrow">→</span>
+      </a>
+
+      <!-- Bluesky -->
+      <a class="social-card" href="https://bsky.app/profile/pradary.bsky.social" target="_blank" rel="noopener">
+        <div class="social-icon">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 10.8c-1.087-2.114-4.046-6.053-6.798-7.995C2.566.944 1.561 1.266.902 1.565.139 1.908 0 3.08 0 3.768c0 .69.378 5.65.624 6.479.815 2.736 3.713 3.66 6.383 3.364.136-.02.275-.039.415-.056-.138.022-.276.04-.415.056-3.912.58-7.387 2.005-2.83 7.078 5.013 5.19 6.87-1.113 7.823-4.308.953 3.195 2.05 9.271 7.733 4.308 4.267-4.308 1.172-6.498-2.74-7.078a8.741 8.741 0 0 1-.415-.056c.14.017.279.036.415.056 2.67.297 5.568-.628 6.383-3.364.246-.828.624-5.79.624-6.478 0-.69-.139-1.861-.902-2.204-.659-.3-1.664-.62-4.3 1.24C16.046 4.748 13.087 8.687 12 10.8z"/>
+          </svg>
+        </div>
+        <div class="social-info">
+          <div class="social-name">Bluesky</div>
+          <div class="social-handle">pradary.bsky.social</div>
+        </div>
+        <span class="social-arrow">→</span>
+      </a>
+
+      <!-- Tumblr -->
+      <a class="social-card" href="https://pradary.tumblr.com" target="_blank" rel="noopener">
+        <div class="social-icon">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M14.563 24c-5.093 0-7.031-3.756-7.031-6.411V9.747H5.116V6.648c3.63-1.313 4.512-4.596 4.71-6.469C9.84.051 9.941 0 9.999 0h3.517v6.114h4.801v3.633h-4.82v7.47c.016 1.001.375 2.371 2.228 2.371h.08c.vedran62-.016 1.354-.295 1.354-.295l1.02 3.452a8.827 8.827 0 0 1-3.616.655"/>
+          </svg>
+        </div>
+        <div class="social-info">
+          <div class="social-name">Tumblr</div>
+          <div class="social-handle">pradary.tumblr.com</div>
+        </div>
+        <span class="social-arrow">→</span>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <p class="footer-text">© 2026 <a href="#">Pradary</a> · PradaBolt</p>
+    <p class="footer-text">Built with ♥ · All rights reserved</p>
+  </footer>
+
+</div>
+
+<script>
+  // ─── THEME SYSTEM ───
+  const root = document.documentElement;
+  const btns = document.querySelectorAll('.theme-btn');
+  const STORAGE_KEY = 'pradabolt-theme';
+
+  const systemDark = () => window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+  function applyTheme(mode) {
+    if (mode === 'system') {
+      root.setAttribute('data-theme', systemDark() ? 'dark' : 'light');
+    } else {
+      root.setAttribute('data-theme', mode);
+    }
+  }
+
+  function setMode(mode) {
+    localStorage.setItem(STORAGE_KEY, mode);
+    applyTheme(mode);
+    btns.forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
+  }
+
+  // Init
+  const saved = localStorage.getItem(STORAGE_KEY) || 'system';
+  setMode(saved);
+
+  btns.forEach(btn => {
+    btn.addEventListener('click', () => setMode(btn.dataset.mode));
+  });
+
+  // Watch system preference
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    if ((localStorage.getItem(STORAGE_KEY) || 'system') === 'system') applyTheme('system');
+  });
+</script>
+
+</body>
+</html>
